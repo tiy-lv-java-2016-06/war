@@ -10,7 +10,7 @@ public class Game {
     private Player player1;
     private Player player2;
 
-    public Game(Player player1, Player player2){
+    public Game(Player player1, Player player2) {
         this.player1 = player1;
         this.player2 = player2;
     }
@@ -33,16 +33,17 @@ public class Game {
      * method "setUpHands" and continues to run while the players still have cards available to use.
      */
     public void runGame() {
-        System.out.println("Let's play War!!");
         int round = 0;
-        while ((player1.hand.size()) != 0 || (player2.hand.size() != 0)) {
+        while ((player1.hand.size() != 0 || (player2.hand.size() != 0))) {
             round++;
             System.out.format("******** Round %d Starting ********\n", round);
             battle();
             if (player1.hand.size() == 0) {
                 System.out.format("%s you are the winner!\n", player2.getName());
+                break;
             } else if (player2.hand.size() == 0) {
                 System.out.format("%s you are the winner!\n", player1.getName());
+                break;
             }
         }
     }
@@ -55,15 +56,15 @@ public class Game {
     public void runWar() {
         ArrayList<Card> warPile = new ArrayList<Card>();
         System.out.println("--------- Its time for WAR!!!!! ---------");
-        for (int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             warPile.add(player1.giveCard());
             warPile.add(player2.giveCard());
             if (player1.hand.size() == 0) {
                 System.out.format("%s you are the winner!\n", player2.getName());
-                break;
+                return;
             } else if (player2.hand.size() == 0) {
                 System.out.format("%s you are the winner!\n", player1.getName());
-                break;
+                return;
             }
         }
         Card player1Card = player1.giveCard();
@@ -84,10 +85,11 @@ public class Game {
             player1.hand.add(player2Card);
             player2.hand.addAll(warPile);
             player2.shuffleHand();
-        } else {
+        } else if (player1Rank.getValue() == player2Rank.getValue()) {
             runWar();
+        } else {
+            runGame();
         }
-
     }
 
     /**
@@ -96,25 +98,33 @@ public class Game {
      * out of cards to play. If the rank is the same, another method is called, runWar, to see who is the winner of
      * that round.
      */
-    public void battle(){
-        Card player1Card = player1.giveCard();
-        Card player2Card = player2.giveCard();
-        System.out.format("%s plays %s\n", player1.getName(), player1Card.toString());
-        System.out.format("%s plays %s\n", player2.getName(), player2Card.toString());
-        Rank player1Rank = player1Card.getRank();
-        Rank player2Rank = player2Card.getRank();
-        if (player1Rank.getValue() > player2Rank.getValue()) {
-            System.out.format("%s won the Round!\n", player1.getName());
-            player1.hand.add(player2Card);
-            player1.hand.add(player1Card);
-            player1.shuffleHand();
-        } else if (player1Rank.getValue() < player2Rank.getValue()) {
-            System.out.format("%s won the Round!\n", player2.getName());
-            player2.hand.add(player1Card);
-            player2.hand.add(player2Card);
-            player2.shuffleHand();
+    public void battle() {
+        if (player1.hand.size() == 0 || player2.hand.size() == 0) {
+            runGame();
         } else {
-            runWar();
+            Card player1Card = player1.giveCard();
+            Card player2Card = player2.giveCard();
+            System.out.format("%s plays %s\n", player1.getName(), player1Card.toString());
+            System.out.format("%s plays %s\n", player2.getName(), player2Card.toString());
+            Rank player1Rank = player1Card.getRank();
+            Rank player2Rank = player2Card.getRank();
+            if (player1Rank.getValue() > player2Rank.getValue()) {
+                System.out.format("%s won the Round!\n", player1.getName());
+                player1.hand.add(player2Card);
+                player1.hand.add(player1Card);
+                player1.shuffleHand();
+            } else if (player1Rank.getValue() < player2Rank.getValue()) {
+                System.out.format("%s won the Round!\n", player2.getName());
+                player2.hand.add(player1Card);
+                player2.hand.add(player2Card);
+                player2.shuffleHand();
+            } else {
+                runWar();
+            }
         }
+    }
+
+    public void gameOver(){
+        System.out.println("Gameover");
     }
 }
